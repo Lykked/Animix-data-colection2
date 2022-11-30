@@ -20,7 +20,7 @@ public class App {
 
         Maquina maquina = new Maquina();
 
-        Maquina maquinaMonitorar = maquina.getMaquina(30);
+        Maquina maquinaMonitorar = maquina.getMaquina(31);
 
         timer.schedule(new TimerTask() {
             @Override
