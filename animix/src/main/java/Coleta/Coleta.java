@@ -53,16 +53,14 @@ public class Coleta {
         Date dataHoraAtual = new Date();
 
         // Coletando memória
-        String memoriaNumbersOnly = conversor.formatarBytes(memoria.getEmUso()).replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "");
+        String memoriaNumbersOnly = conversor.formatarBytes(memoria.getEmUso()).replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "").replace(" KiB", "");
         Double usoMemoria = Double.parseDouble(memoriaNumbersOnly);
 
-        String memoriaTotalNumersOnly = conversor.formatarBytes(memoria.getTotal()).replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "");
+        String memoriaTotalNumersOnly = conversor.formatarBytes(memoria.getTotal()).replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "").replace(" KiB", "");
         Double totalMemoria = Double.parseDouble(memoriaTotalNumersOnly);
 
         Double usoMemoriaPorcentagem = getPorcentual(totalMemoria, usoMemoria);
 
-        //Coletando temperatura
-        Double temp = temperatura.getTemperatura();
 
         //Coletando uso da CPU
         Double usoCpu = processador.getUso();
@@ -84,24 +82,23 @@ public class Coleta {
 
             try {
                 String discoTotalGb = conversor.formatarBytes(disco.getTamanho());
-                String discoNumbersOnly = discoTotalGb.replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "");
+                String discoNumbersOnly = discoTotalGb.replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "").replace(" KiB", "");
                 Double discoTotal = Double.parseDouble(discoNumbersOnly);
                 disco.getTempoDeTransferencia();
 
                 // Coletando leitura do disco
                 String discoLeitura = conversor.formatarBytes(disco.getBytesDeLeitura());
-                String leituraNumbers = discoLeitura.replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "");
+                String leituraNumbers = discoLeitura.replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "").replace(" KiB", "");
                 Double leitura = Double.parseDouble(leituraNumbers);
 
                 //Coletando escrita do disco
                 String discoEscrita = conversor.formatarBytes(disco.getBytesDeEscritas());
-                String escritaNumbers = discoEscrita.replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "");
+                String escritaNumbers = discoEscrita.replace(" GiB", "").replace(",", ".").replace(" TiB", "").replace(" MiB", "").replace(" KiB", "");
                 Double escrita = Double.parseDouble(escritaNumbers);
 
                 Dados dado = new Dados();
                 dado.setUsoMemoria(usoMemoriaPorcentagem);
                 dado.setUsoCpu(usoCpu);
-                dado.setTemperatura(temp);
                 dado.setQtdProcessos(qtdProcessos);
                 dado.setQtdServicos(qtdServicos);
                 dado.setDataColeta(data);
@@ -115,22 +112,25 @@ public class Coleta {
 
                 Boolean isCritico = dado.getIsCritico();
                 String comentarios = dado.getComment().toString();
+                
+                
 
-                if (dado.getComment().size() == 2) {
-                    maquina.setSituacao(2);
-                } else if (dado.getComment().size() == 3) {
-                    maquina.setSituacao(1);
-                } else {
-                    maquina.setSituacao(3);
+                switch (dado.getComment().size()) {
+                    case 2:
+                        maquina.setSituacao(1);
+                        break;
+                    default:
+                        maquina.setSituacao(3);
+                        break;
                 }
 
                 //Inserindo dados
                 try {
                     database.update("insert into dados values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            maquina.getIdMaquina(), usoCpu, usoMemoriaPorcentagem, qtdProcessos, qtdServicos, data , isCritico, comentarios, leitura, escrita, discoTotal,hora);
+                            maquina.getIdMaquina(), usoCpu, usoMemoriaPorcentagem, qtdProcessos, qtdServicos, data , isCritico, comentarios, leitura, escrita, discoTotal, hora);
 
-                    databaseLocal.update("insert into dados values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            null, maquina.getIdMaquina(), usoCpu, usoMemoriaPorcentagem, temp, qtdProcessos, qtdServicos, data, hora, isCritico, comentarios, leitura, escrita, discoTotal);
+                    //databaseLocal.update("insert into dados values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    //        null, maquina.getIdMaquina(), usoCpu, usoMemoriaPorcentagem, qtdProcessos, qtdServicos, data, hora, isCritico, comentarios, leitura, escrita, discoTotal);
 
                 } catch (Exception e) {
                     System.out.println("Erro ao inserir os dados");
@@ -153,18 +153,12 @@ public class Coleta {
     public void verifyData(Dados dado, Maquina maquina) {
 
         Double memoriaIdeal = maquina.getMemoriaIdeal();
-        Double temperaturaIdeal = maquina.getTemperaturaIdeal();
         Double processadorIdeal = maquina.getProcessamentoIdeal();
         List<String> comments = new ArrayList<>();
 
         if (dado.getUsoMemoria() > memoriaIdeal) {
             dado.setIsCritico(Boolean.TRUE);
             comments.add("Memoria fora dos parametros ideais");
-            dado.setComment(comments);
-        }
-        if (dado.getTemperatura() > temperaturaIdeal) {
-            dado.setIsCritico(Boolean.TRUE);
-            comments.add("Temperatura fora dos parametros ideais");
             dado.setComment(comments);
         }
         if (dado.getUsoCpu() > processadorIdeal) {
@@ -174,15 +168,6 @@ public class Coleta {
         } else {
             dado.setIsCritico(false);
         }
-    }
-
-    public List<Dados> getLastData(Integer qtdDados, Integer fkMaquina) {
-        // Montando objeto de retorno com os ultimos dados
-
-        List<Dados> dados = database.query("select top (?) * from dados where fkMaquina = (?)",
-                new BeanPropertyRowMapper(Dados.class), qtdDados, fkMaquina);
-
-        return dados;
     }
 
     private static Double getPorcentual(Double espacoTotal, Double espacoEmUso) {
