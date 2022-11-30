@@ -136,7 +136,7 @@ public class HomePage extends javax.swing.JFrame {
         jLabel9.setBackground(new java.awt.Color(111, 66, 193));
         jLabel9.setFont(new java.awt.Font("Microsoft JhengHei", 1, 24)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Sistema");
+        jLabel9.setText("SO");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -177,7 +177,7 @@ public class HomePage extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 18, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
@@ -189,9 +189,7 @@ public class HomePage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void maq1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maq1ActionPerformed
-        if (maq1.isVisible()) {
-            maq1.setVisible(false);
-        }
+      
      
         try {
               Timer timer = new Timer();
@@ -210,9 +208,9 @@ public class HomePage extends javax.swing.JFrame {
                 }
             }
         }, 1500, 1500);
-                proce01.setText("\n Tempo de Atividade: " + maquinaMonitorar.getProcessador());
+                proce01.setText("\n" + maquinaMonitorar.getProcessador());
                 proce2.setText("\n Memória Ram utilizada: " + maquinaMonitorar.getMemoria());
-                proce3.setText("\n Data e hora dos processos: " + maquinaMonitorar.getSistema());
+                proce3.setText("\n Sistema operacional: " + maquinaMonitorar.getSistema());
         } catch (Exception e) {
         }
     
