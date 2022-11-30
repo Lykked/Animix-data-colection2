@@ -16,7 +16,7 @@ public class ConnectionMySqlLocal {
         datasourceMySql.setDriverClassName("com.mysql.cj.jdbc.Driver");
         datasourceMySql.setUrl("jdbc:mysql://localhost/animix?useTimezone=true&serverTimezone=UTC");
         datasourceMySql.setUsername("root");
-        datasourceMySql.setPassword("67578900");
+        datasourceMySql.setPassword("urubu100");
             connectionMySql = new JdbcTemplate(datasourceMySql);
     } 
 
